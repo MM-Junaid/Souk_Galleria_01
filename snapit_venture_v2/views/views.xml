@@ -107,7 +107,7 @@
 			<field name="location_dest_id" position="attributes">
         		<attribute name="attrs">{'readonly':[('state','not in',['draft','confirmed','assigned'])]}</attribute>
 			</field>
-			<xpath expr="//button[@name='button_quality_alert']" position='before'>
+			<xpath expr="//button[@name='button_validate']" position='after'>
 				<button name="set_shipped" string="Shipped" class="oe_highlight" type="object" attrs="{'invisible': ['|','|',('state', '!=', 'done'),('delivery_status','!=','In Process'),('sale_id','=',False)]}"/>
 				<button name="set_delivered" string="Delivered" class="oe_highlight" type="object" attrs="{'invisible': ['|','|',('state', '!=', 'done'),('delivery_status','!=','Shipped'),('sale_id','=',False)]}"/>
 			</xpath>
@@ -116,154 +116,7 @@
 		</field>
 	</record>
 	
-	<record model="ir.ui.view" id="inherit_quality_point_view_form">
-        <field name="name">quality.point.form</field>
-        <field name="model">quality.point</field>
-        <field name="inherit_id" ref="quality.quality_point_view_form" />
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-			<xpath expr="//field[@name='user_id']" position='after'>
-				<field name="max_tolerance"/>
-			</xpath>
-			<xpath expr="//page[@name='instructions']" position='before'>
-				<page string='Checklist' name='checklist'>
-					<field name="quality_checklist_ids">
-						<tree>
-							<field name="category_id"/>
-							<field name="criteria_id" required="1"/>
-						</tree>
-						<form>
-							<group col="4" colspan="4">
-								<field name="category_id"/>
-								<field name="criteria_id" required="1"/>
-							</group>
-						</form>
-					</field>
-				</page>
-			</xpath>
-		</field>
-	</record>
-	<record model="ir.ui.view" id="inherit_quality_check_view_form">
-        <field name="name">quality.check.view.form</field>
-        <field name="model">quality.check</field>
-        <field name="inherit_id" ref="quality_control.quality_check_view_form" />
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-			<xpath expr="//field[@name='partner_id']" position='after'>
-				<field name="max_tolerance"/>
-				<field name="total_points"/>
-				<field name="qc_by"  widget="many2many_tags"  readonly="1"/>
-        	</xpath>
-			<xpath expr="//page[@name='notes']" position='before'>
-				<page string='Checklist' name='checklist'>
-					<field name="quality_checklist_ids">
-						<tree>
-							<field name="category_id" readonly="1"/>
-							<field name="criteria_id" readonly="1"/>
-							<field name="decision" readonly="1"/>
-						</tree>
-						<form>
-							<group col="4" colspan="4">
-								<field name="category_id" readonly="1"/>
-								<field name="criteria_id" readonly="1"/>
-								<field name="decision" readonly="1"/>
-							</group>
-						</form>
-					</field>
-				</page>
-			</xpath>
-		</field>
-	</record>
 	
-	<record model="ir.ui.view" id="inherit_quality_check_view_form_small">
-        <field name="name">quality.check.view.form</field>
-        <field name="model">quality.check</field>
-        <field name="inherit_id" ref="quality_control.quality_check_view_form_small" />
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-			<xpath expr="//field[@name='note']" position='attributes'>
-				<attribute name="attrs">{'invisible':True}</attribute>
-			</xpath>
-			<field name="company_id" position="after">
-				<group col="4" colspan="4">
-					<field name="max_tolerance"/>
-					<field name="total_points"/>
-					<field name="qc_by"  widget="many2many_tags"/>
-				</group>
-				<fieldset>
-            		<legend style="border-bottom: 2px solid">Checklist</legend>
-				</fieldset>
-				<field name="quality_checklist_ids" readonly="0" >
-					<tree editable="bottom" delete="false" create="false">
-						<field name="category_id" readonly="1"/>
-						<field name="criteria_id" readonly="1"/>
-						<field name="decision"/>
-					</tree>
-        		</field>
-        	</field>
-		</field>
-	</record>
-	
-	<record model="ir.ui.view" id="quality_checklist_category_form">
-        <field name="name">quality.checklist.category.form</field>
-        <field name="model">quality.checklist.category</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-			<form>
-				<group>
-					<field name="name"/>
-				</group>
-			</form>
-		</field>
-	</record>
-	
-	<record model="ir.ui.view" id="quality_checklist_category_tree">
-        <field name="name">quality.checklist.category.tree</field>
-        <field name="model">quality.checklist.category</field>
-        <field name="type">tree</field>
-        <field name="arch" type="xml">
-			<tree>
-				<field name="name"/>
-			</tree>
-		</field>
-	</record>
-	<record model="ir.actions.act_window" id="action_quality_checklist_category">
-        <field name="name">Quality Checklist Category</field>
-        <field name="res_model">quality.checklist.category</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
-	<record model="ir.ui.view" id="quality_checklist_criteria_form">
-        <field name="name">quality.checklist.criteria.form</field>
-        <field name="model">quality.checklist.criteria</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
-			<form>
-				<group>
-					<field name="name"/>
-					<field name="quality_points"/>
-				</group>
-			</form>
-		</field>
-	</record>
-	
-	<record model="ir.ui.view" id="quality_checklist_criteria_tree">
-        <field name="name">quality.checklist.criteria.tree</field>
-        <field name="model">quality.checklist.criteria</field>
-        <field name="type">tree</field>
-        <field name="arch" type="xml">
-			<tree>
-				<field name="name"/>
-				<field name="quality_points"/>
-			</tree>
-		</field>
-	</record>
-	<record model="ir.actions.act_window" id="action_quality_checklist_criteria">
-        <field name="name">Quality Checklist Criteria</field>
-        <field name="res_model">quality.checklist.criteria</field>
-        <field name="view_mode">tree,form</field>
-    </record>
-
 
 	<record model="ir.ui.view" id="stock_nonmoving_products_form">
         <field name="name">stock.nonmoving.products.form</field>
@@ -386,7 +239,6 @@
 			<xpath expr="//field[@name='product_id']" position='after'>
 				<field name="internal_refrence"/>
 				<field name="barcode"/>
-				<field name="prodcut_brand_id"/>
 			</xpath>
 			<xpath expr="//field[@name='available_quantity']" position='after'>
 				<field name="cost"/>
@@ -407,10 +259,6 @@
 			<xpath expr="//field[@name='owner_id']" position='after'>
 				<field name="internal_refrence"/>
 				<field name="barcode"/>
-				<field name="prodcut_brand_id"/>
-			</xpath>
-			<xpath expr="//filter[@name='productgroup']" position='before'>
-				<filter string='Product Brand' name="prodcut_brand_id" context="{'group_by': 'prodcut_brand_id'}"/>
 			</xpath>
 		</field>
 	</record>

@@ -47,7 +47,7 @@ class SaleOrder(models.Model):
                            'user_id':user_obj.id,
                            }
             mail_activity=self.env['mail.activity'].sudo().create(activity_vals) 
-
+    
 class Account(models.Model):
     _inherit='account.account'
     limit_applicable=fields.Boolean('Limit Applicable')
@@ -113,87 +113,6 @@ class Picking(models.Model):
         self.sale_id.write({'delivery_status':'Delivered'})
     
     
-    def button_validate(self):
-        for each in self.check_ids:
-            if each.quality_state=='fail':
-                raise ValidationError("""Sorry you are not allowed to proceed, Quality check for '"""+str(each.product_id.name)+"""' has been failed.""")
-        return super(Picking,self).button_validate()
-    
-class QualityChecklistCategory(models.Model):
-    _name='quality.checklist.category'
-    name=fields.Char('Category',required=True)
-
-class QualityChecklistCriteria(models.Model):
-    _name='quality.checklist.criteria'
-    name=fields.Char('Criteria',required=True)
-    quality_points=fields.Float('Quality Points',required=True)
-    
-class QualityChecklist(models.Model):
-    _name='quality.checklist'
-    category_id=fields.Many2one('quality.checklist.category','Category',required=True)
-    criteria_id=fields.Many2one('quality.checklist.criteria','Criteria')
-    decision=fields.Boolean('Decision')
-    quality_check_id=fields.Many2one('quality.check','Quality Check')
-    quality_point_id=fields.Many2one('quality.point','Quality Point')
-class QualityPoints(models.Model):
-    _inherit='quality.point'
-    quality_checklist_ids=fields.One2many('quality.checklist','quality_point_id','Quality Check List')
-    max_tolerance=fields.Float('Max. Tolerance (%)')
-    
-
-class QualityCheck(models.Model):
-    _inherit='quality.check'
-    quality_checklist_ids=fields.One2many('quality.checklist','quality_check_id','Quality Check List',compute='_get_quality_checklist',store=True)
-    max_tolerance=fields.Float('Max. Tolerance (%)',related='point_id.max_tolerance')
-    total_points=fields.Float('Total Quality Points',compute='_cal_quality_points')
-    qc_by=fields.Many2many('res.users','quality_checks_user_rel','check_id','user_id','QC By')
-    
-    def do_pass(self):
-        res=super(QualityCheck,self).do_pass()
-        if self.picking_id:
-            qc_by_list = []
-            for qc in self.qc_by:
-                qc_by_list.append(qc.id)
-            stock_move_obj=self.env['stock.move'].search([('picking_id','=',self.picking_id.id)])
-            if stock_move_obj.sale_line_id:
-                stock_move_obj.sale_line_id.order_id.write({'qc_by':[(6,0,qc_by_list)]})
-            elif stock_move_obj.purchase_line_id:
-                stock_move_obj.purchase_line_id.order_id.write({'qc_by':[(6,0,qc_by_list)]})
-        return res
-    
-    def do_fail(self):
-        res=super(QualityCheck,self).do_fail()
-        if self.picking_id:
-            qc_by_list = []
-            for qc in self.qc_by:
-                qc_by_list.append(qc.id)
-            stock_move_obj=self.env['stock.move'].search([('picking_id','=',self.picking_id.id)])
-            if stock_move_obj.sale_line_id:
-                stock_move_obj.sale_line_id.order_id.write({'qc_by':[(6,0,qc_by_list)]})
-            elif stock_move_obj.purchase_line_id:
-                stock_move_obj.purchase_line_id.order_id.write({'qc_by':[(6,0,qc_by_list)]})
-        return res
-    
-    @api.depends('point_id')
-    def _get_quality_checklist(self):
-        for each in self:
-            if each.point_id:
-                if not each.quality_checklist_ids:
-                    for checklist in each.point_id.quality_checklist_ids:
-                        checklist_vals={'category_id':checklist.category_id.id,
-                                        'criteria_id':checklist.criteria_id.id,
-                                        'quality_check_id':each.id}
-                        self.env['quality.checklist'].sudo().create(checklist_vals)
-    
-    @api.depends('quality_checklist_ids')
-    def _cal_quality_points(self):
-        for each in self:
-            total_points=0
-            for checklist in each.quality_checklist_ids:
-                if checklist.decision==True:
-                    total_points+=checklist.criteria_id.quality_points
-            each.total_points=total_points
-
 
 class NonMovingProducts(models.Model):
     _name='stock.nonmoving.products'
@@ -298,7 +217,8 @@ class KsProductTemplate(models.Model):
         for tmpl in ks_product_templ_obj:
             product_template=self.env['product.template'].search([('id','=',tmpl.ks_shopify_product_template.id)])
             for product in product_template:
-                product.sudo().write({'barcode':tmpl.ks_barcode})
+                product.sudo().write({'barcode':tmpl.ks_barcode,
+                                      'list_price':tmpl.ks_shopify_regular_price})
             ks_product_variant_obj=self.env['ks.shopify.product.variant'].search([('ks_shopify_product_tmpl_id','=',tmpl.id)])
             if product_template:
                 for ks_product in ks_product_variant_obj:
@@ -307,7 +227,7 @@ class KsProductTemplate(models.Model):
                             varient.sudo().write({'barcode':ks_product.ks_barcode,
                                                   'weight':ks_product.ks_weight,
                                                   'lst_price':ks_product.ks_shopify_regular_price,
-                                              'default_code':ks_product.ks_default_code})
+                                                  'default_code':ks_product.ks_default_code})
     
 class Product(models.Model):
     _inherit='product.product'
@@ -345,7 +265,7 @@ class ProductTemplate(models.Model):
                     for varient in ks_product_varient:
                             varient.sudo().write({'ks_barcode':product.barcode,
                                                   'ks_weight':product.weight,
-                                              'ks_default_code':product.default_code})
+                                                  'ks_default_code':product.default_code})
 
     @api.depends('list_price','standard_price')
     def _cal_margin(self):
@@ -415,7 +335,7 @@ class StockQuant(models.Model):
     _inherit='stock.quant'
     internal_refrence=fields.Char('Internal Refrence',related='product_id.product_tmpl_id.default_code')
     barcode=fields.Char('Barcode',related='product_id.barcode')
-    prodcut_brand_id=fields.Many2one('common.product.brand.ept',related='product_id.product_tmpl_id.product_brand_id',store=True)
+#     prodcut_brand_id=fields.Many2one('common.product.brand.ept',related='product_id.product_tmpl_id.product_brand_id',store=True)
     cost=fields.Float('Cost',compute='_get_cost_price')
     
     @api.depends('value','available_quantity')
