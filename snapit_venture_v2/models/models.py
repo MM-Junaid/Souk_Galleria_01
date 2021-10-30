@@ -28,7 +28,7 @@ class SaleOrder(models.Model):
             total_weight=0
             if each.order_line:
                 for line in each.order_line:
-                    total_weight+=line.x_studio_weight
+                    total_weight+=line.weight
             each.total_weight=total_weight
     
     def action_confirm(self):
@@ -47,6 +47,9 @@ class SaleOrder(models.Model):
                            'user_id':user_obj.id,
                            }
             mail_activity=self.env['mail.activity'].sudo().create(activity_vals) 
+class SaleOrderLine(models.Model):
+    _inherit='sale.order.line'
+    weight=fields.Float('Weight')
     
 class Account(models.Model):
     _inherit='account.account'
