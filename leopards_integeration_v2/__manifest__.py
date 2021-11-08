@@ -21,6 +21,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
+        'data/leopards_cron.xml'
         
     ],
     # only loaded in demonstrat,ion mode
