@@ -24,12 +24,14 @@ class SaleOrder(models.Model):
     shippment_status=fields.Char('Shippment')
     packing_status=fields.Selection([('In Process','In Process'),('Done','Done')],default='In Process')
     
-    @api.constrains('order_line')
-    def check_quantity(self):
-        for each in self:
-            for line in each.order_line:
-                if line.qty_available_today<line.product_uom_qty:
-                    raise ValidationError('%s not available in stock. Please review before proceed.'%(line.product_id.name))
+    def set_packing_status(self):
+        self.write({'packing_status':'Done'})
+#     @api.constrains('order_line')
+#     def check_quantity(self):
+#         for each in self:
+#             for line in each.order_line:
+#                 if line.qty_available_today<line.product_uom_qty:
+#                     raise ValidationError('%s not available in stock. Please review before proceed.'%(line.product_id.name))
     
     @api.depends('order_line')
     def _cal_total_weight(self):
@@ -43,25 +45,19 @@ class SaleOrder(models.Model):
             each.total_packing_weight=total_packing_weight
             each.total_weight=total_weight+total_packing_weight
     def action_confirm(self):
+        if not self.packing_status:
+            raise ValidationError('Please set packing status done before confirm the order.')
+        for line in self.order_line:
+            if line.qty_available_today<line.product_uom_qty:
+                raise ValidationError('%s not available in stock. Please review before proceed.'%(line.product_id.name))
         super(SaleOrder, self).action_confirm()
-        model_obj=self.env['ir.model'].search([('model','=',self._name)])
-        user_obj=self.company_id.auto_schedule_user
-        if user_obj:
-            activity_vals={'res_model_id':model_obj.id,
-                           'res_model':self._name,
-                           'res_id':self.id,
-                           'res_name':self.name,
-                           'activity_type_id':4,
-                           'summary':'Dispatch Order',
-                           'note':'Order No.'+str(self.name)+' has been verified. please go for further process',
-                           'date_deadline':date.today() + timedelta(days=5),
-                           'user_id':user_obj.id,
-                           }
-            mail_activity=self.env['mail.activity'].sudo().create(activity_vals) 
+        
 class SaleOrderLine(models.Model):
     _inherit='sale.order.line'
     weight=fields.Float('Weight',related='product_id.weight',store=True)
     packing_weight=fields.Float('Packing Weight')
+    packing_done=fields.Boolean('Packing Done',default=False)
+    
 class Account(models.Model):
     _inherit='account.account'
     limit_applicable=fields.Boolean('Limit Applicable')
@@ -129,7 +125,7 @@ class Picking(models.Model):
     _inherit = "stock.picking"
     delivery_status=fields.Selection([('In Process','In Process'),('Shipped','Shipped'),('Delivered','Delivered')],'Delivery Status',default='In Process',tracking=True)
     shippment_status=fields.Char('Shippment')
-    packing_status=fields.Selection([('In Process','In Process'),('Done','Done')],default='In Process')
+    
     def set_shipped(self):
         self.write({'delivery_status':'Shipped'})
         self.sale_id.write({'delivery_status':'Shipped'})
@@ -141,14 +137,7 @@ class Picking(models.Model):
     def re_send(self):
         self.write({'shippment_status':'Re-Sent'})
         self.sale_id.write({'shippment_status':'Re-Sent'})
-    
-    def set_packing_status(self):
-        for each in self.move_ids_without_package:
-            if not each.packing_done:
-                raise ValidationError('Please set packing status for all products in Operations to proceed.')
-        self.write({'packing_status':'Done'})
-        self.sale_id.write({'packing_status':'Done'})
-    
+
     
 
 class NonMovingProducts(models.Model):
@@ -337,7 +326,7 @@ class ProductTemplate(models.Model):
                 
 class StockMove(models.Model):
     _inherit='stock.move'
-    packing_done=fields.Boolean('Packing Done',default=False)
+    
     def write(self,vals):
         res=super(StockMove,self).write(vals)
         for each in self:
