@@ -441,7 +441,6 @@ class KsQueueManager(models.TransientModel):
                              ('ks_shopify_draft_order_id', '=', record.ks_shopify_id),
                              ('ks_shopify_instance', '=', record.ks_shopify_instance.id),])
                         if order_record_exist:
-                            order_record_exist.order_line.unlink()
                             order_record_exist.ks_shopify_import_order_update(order_data, queue_record=record)
                         else:
                             if not order_data.get('cancelled_at'):
