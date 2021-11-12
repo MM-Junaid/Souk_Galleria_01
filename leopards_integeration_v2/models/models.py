@@ -33,7 +33,38 @@ class SaleOrder(models.Model):
     city=fields.Char('City')
     leopards_weight=fields.Float('Leopards Weight')
     
-    
+    def get_shimpment_details_queue(self):
+        shopify_instance=self.env['ks.shopify.connector.instance'].search([])
+        for instance in shopify_instance:
+            sale_orders=self.env['sale.order'].search([('ks_shopify_instance','=',instance.id)])
+            for order in sale_orders:
+                data={
+                'api_key':str(instance.leopards_api_key),
+                'api_password':str(instance.leopards_api_password),
+                'shipment_order_id':[str(order.name)]
+                }
+                my_json_string = json.dumps(data)
+                abc_headers={
+               'Content-Type': 'application/json',
+               }
+                result = requests.post(str(instance.get_cn_url),headers=abc_headers,data=my_json_string)
+                error=result.json().get('error')
+                if not error:
+                    for each in result.json().get('data'):
+                        tracking_number=each['track_number']
+                        shipment_status=each['booked_packet_status']
+                        city=each['destination_city']
+                        leopards_weight=each['booked_packet_weight']
+                    order.write({'leopards_tracking_url':str(instance.leopards_tracking_url)+"/"+tracking_number,
+                                        'shipment_status':shipment_status,
+                                        'city':city,
+                                        'leopards_weight':leopards_weight})
+                    account_move_obj=self.env['account.move'].search([('invoice_origin','=',order.name)])
+                    for inv in account_move_obj:
+                        inv.write({'leopards_tracking_url':str(instance.leopards_tracking_url)+"/"+tracking_number,
+                                        'shipment_status':shipment_status,
+                                        'city':city,
+                                        'leopards_weight':leopards_weight})
     def get_shipment_details(self):
         shopify_instance=self.env['ks.shopify.connector.instance'].search([('id','=',self.ks_shopify_instance.id)])
         if shopify_instance:

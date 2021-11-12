@@ -4,7 +4,7 @@ import logging
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
-from datetime import datetime
+from datetime import datetime,timedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -311,7 +311,12 @@ class KsSaleOrderInherit(models.Model):
             if include:
                 all_retrieved_data = self.env['ks.api.handler'].ks_get_all_data(instance, 'orders', include)
             else:
-                all_retrieved_data = self.env['ks.api.handler'].ks_get_all_data(instance, 'orders')
+                if not date_before:
+                    date_before=datetime.today().strftime('%Y-%m-%d')
+                if not date_after:
+                    date_after=datetime.now() - timedelta(days=5)
+                    date_after=date_after.strftime('%Y-%m-%d')
+                all_retrieved_data = self.env['ks.api.handler'].ks_get_all_data(instance, 'orders',ids=False, additional_id=False,date_before=date_before,date_after=date_after)
         except Exception as e:
             self.env['ks.shopify.logger'].ks_create_api_log_params(operation_performed="fetch",
                                                                    status="failed",
@@ -734,11 +739,12 @@ class KsSaleOrderInherit(models.Model):
             ks_product_product = ks_product_layer.ks_product_product if ks_product_layer.ks_product_product else False
             ks_product_template = ks_product_layer.ks_shopify_product_template if ks_product_layer.ks_shopify_product_template else False
             sale_order_line_exist = False
-            # sale_order_exist.order_line.filtered([('product_id', '=', ks_product_product.id)],
-            #     limit=1)
+#             sale_order_exist.order_line.filtered([('product_id', '=', ks_product_product.id)],
+#                 limit=1)
+            product = self.ks_get_product_ids(instance, each_record)
             if ks_product_product:
                 sale_order_line_exist = self.env['sale.order.line'].search(
-                [('product_id', '=', ks_product_product.id),
+                [('product_id', '=', product.id),
                  ('order_id', '=', sale_order_exist.id)],
                 limit=1)
             elif ks_product_template:
@@ -781,9 +787,9 @@ class KsSaleOrderInherit(models.Model):
                     line_items_data.update({
                         "price_tax": each_record.get('tax_lines')[0].get('price')
                     })
-                if sale_order_line_exist:
-                    order_lines.append((1, sale_order_line_exist.id, line_items_data))
-                else:
+                if not sale_order_line_exist:
+#                     order_lines.append((1, sale_order_line_exist.id, line_items_data))
+#                 else:
                     order_lines.append((0, 0, line_items_data))
             else:
                 raise TypeError(

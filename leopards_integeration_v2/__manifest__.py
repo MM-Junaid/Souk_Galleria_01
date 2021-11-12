@@ -16,11 +16,12 @@
     'installable': True,
     'auto_install': False,
 
-    'depends': ['base','ks_shopify','sale_management','snapit_venture_v1'],
+    'depends': ['base','ks_shopify','sale_management','snapit_venture_v2'],
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
+        'data/leopards_cron.xml'
         
     ],
     # only loaded in demonstrat,ion mode

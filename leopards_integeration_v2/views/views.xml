@@ -34,8 +34,8 @@
 			</xpath>
 			<xpath expr="//group[@name='sale_header']" position='after'>
 				<group col="4" colspan="4" name="shipment_details" string='Shipment Details'>
-					<field name="leopards_tracking_url" widget='url' readonly="1"/>
-					<field name="shipment_status" readonly="1"/>
+					<field name="leopards_tracking_url" widget='url'/>
+					<field name="shipment_status" />
 					<field name="city"/>
 					<field name="leopards_weight" readonly="1"/>
 				</group>
@@ -57,7 +57,7 @@
 			</xpath>
 			<xpath expr="//field[@name='amount_total']" position='before'>
 				<field name="total_weight"/>
-				<field name="leopards_weight"/>
+				<field name="leopards_weight" readonly="1"/>
 			</xpath>
 		</field>
 	</record>
@@ -70,9 +70,9 @@
         <field name="arch" type="xml">
 			<xpath expr="//group" position='after'>
 				<group col="4" colspan="4" name="shipment_details" string='Shipment Details'>
-					<field name="leopards_tracking_url" widget='url' readonly="1"/>
-					<field name="shipment_status" readonly="1"/>
-					<field name="city" readonly="1"/>
+					<field name="leopards_tracking_url" widget='url' />
+					<field name="shipment_status"/>
+					<field name="city" />
 				</group>
 			</xpath>
 		</field>
