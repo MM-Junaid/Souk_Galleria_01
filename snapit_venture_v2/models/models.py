@@ -47,9 +47,9 @@ class SaleOrder(models.Model):
     def action_confirm(self):
         if not self.packing_status:
             raise ValidationError('Please set packing status done before confirm the order.')
-        for line in self.order_line:
-            if line.qty_available_today<line.product_uom_qty:
-                raise ValidationError('%s not available in stock. Please review before proceed.'%(line.product_id.name))
+#         for line in self.order_line:
+#             if line.qty_available_today<line.product_uom_qty:
+#                 raise UserError('%s not available in stock. Please review before proceed.'%(line.product_id.name))
         super(SaleOrder, self).action_confirm()
         
 class SaleOrderLine(models.Model):
