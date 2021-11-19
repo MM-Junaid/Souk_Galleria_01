@@ -332,7 +332,7 @@ class StockMove(models.Model):
         for each in self:
             if each.purchase_line_id:
                 upper_limit=self.company_id.stock_receive_upper_limit
-                lower_limit=self.company_id.stock_receive_lower_limit
+                lower_limit=-(self.company_id.stock_receive_lower_limit)
                 done_qty=each.quantity_done
                 demand_qty=each.product_uom_qty
                 receive_percentage=0
