@@ -24,6 +24,9 @@ class SaleOrder(models.Model):
     shippment_status=fields.Char('Shippment')
     packing_status=fields.Selection([('In Process','In Process'),('Done','Done')],default='In Process')
     
+    confirmed_by=fields.Many2one('res.users','Confirm By')
+    confirmed_at=fields.Datetime('Confirm At')
+    
     def set_packing_status(self):
         self.write({'packing_status':'Done'})
 #     @api.constrains('order_line')
@@ -45,6 +48,8 @@ class SaleOrder(models.Model):
             each.total_packing_weight=total_packing_weight
             each.total_weight=total_weight+total_packing_weight
     def action_confirm(self):
+        self.write({'confirmed_by':self.env.user.id,
+                    'confirmed_at':fields.Datetime.now()})
         if not self.packing_status:
             raise ValidationError('Please set packing status done before confirm the order.')
 #         for line in self.order_line:
@@ -228,11 +233,11 @@ class NonMovingProducts(models.Model):
 class ResCompany(models.Model):
     _inherit='res.company'
     auto_schedule_user=fields.Many2one('res.users','Auto Schedule Activity Account')
-    stock_receive_upper_limit=fields.Float('Upper Limit (%)')
-    stock_receive_lower_limit=fields.Float('Lower Limit (%)')
-    
-    stock_dispatch_upper_limit=fields.Float('Upper Limit (%)')
-    stock_dispatch_lower_limit=fields.Float('Lower Limit (%)')
+#     stock_receive_upper_limit=fields.Float('Upper Limit (%)')
+#     stock_receive_lower_limit=fields.Float('Lower Limit (%)')
+#     
+#     stock_dispatch_upper_limit=fields.Float('Upper Limit (%)')
+#     stock_dispatch_lower_limit=fields.Float('Lower Limit (%)')
 class KsProductTemplate(models.Model):
     _inherit='ks.shopify.product.template'
     
@@ -327,35 +332,35 @@ class ProductTemplate(models.Model):
 class StockMove(models.Model):
     _inherit='stock.move'
     
-    def write(self,vals):
-        res=super(StockMove,self).write(vals)
-        for each in self:
-            if each.purchase_line_id:
-                upper_limit=self.company_id.stock_receive_upper_limit
-                lower_limit=-(self.company_id.stock_receive_lower_limit)
-                done_qty=each.quantity_done
-                demand_qty=each.product_uom_qty
-                receive_percentage=0
-                if done_qty and demand_qty:
-                    receive_percentage=((done_qty/demand_qty)*100)-100
-                if receive_percentage!=0:
-                    if receive_percentage>upper_limit:
-                            raise ValidationError('Done quantity should not be greater than allowed upper limit.')
-                    if receive_percentage<lower_limit:
-                        raise ValidationError('Done quantity should not be less than allowed lower limit.')
-            elif each.sale_line_id:
-                upper_limit=self.company_id.stock_dispatch_upper_limit
-                lower_limit=self.company_id.stock_dispatch_lower_limit
-                done_qty=each.quantity_done
-                demand_qty=each.product_uom_qty
-                dispatch_percentage=0
-                if done_qty and demand_qty:
-                    dispatch_percentage=((done_qty/demand_qty)*100)-100
-                if dispatch_percentage!=0:
-                    if dispatch_percentage>upper_limit:
-                        raise ValidationError('Done quantity should not be greater than allowed upper limit.')
-                    if dispatch_percentage<lower_limit:
-                        raise ValidationError('Done quantity should not be less than allowed lower limit.')
+#     def write(self,vals):
+#         res=super(StockMove,self).write(vals)
+#         for each in self:
+#             if each.purchase_line_id:
+#                 upper_limit=self.company_id.stock_receive_upper_limit
+#                 lower_limit=-(self.company_id.stock_receive_lower_limit)
+#                 done_qty=each.quantity_done
+#                 demand_qty=each.product_uom_qty
+#                 receive_percentage=0
+#                 if done_qty and demand_qty:
+#                     receive_percentage=((done_qty/demand_qty)*100)-100
+#                 if receive_percentage!=0:
+#                     if receive_percentage>upper_limit:
+#                             raise ValidationError('Done quantity should not be greater than allowed upper limit.')
+#                     if receive_percentage<lower_limit:
+#                         raise ValidationError('Done quantity should not be less than allowed lower limit.')
+#             elif each.sale_line_id:
+#                 upper_limit=self.company_id.stock_dispatch_upper_limit
+#                 lower_limit=self.company_id.stock_dispatch_lower_limit
+#                 done_qty=each.quantity_done
+#                 demand_qty=each.product_uom_qty
+#                 dispatch_percentage=0
+#                 if done_qty and demand_qty:
+#                     dispatch_percentage=((done_qty/demand_qty)*100)-100
+#                 if dispatch_percentage!=0:
+#                     if dispatch_percentage>upper_limit:
+#                         raise ValidationError('Done quantity should not be greater than allowed upper limit.')
+#                     if dispatch_percentage<lower_limit:
+#                         raise ValidationError('Done quantity should not be less than allowed lower limit.')
 
 class StockQuant(models.Model):
     _inherit='stock.quant'

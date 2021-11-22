@@ -1,0 +1,240 @@
+
+
+<odoo>
+    <record id="inherit_account_move_line" model="ir.ui.view">
+        <field name="name">Account.Move</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='analytic_account_id']" position="after">
+                <field name="budget_id" string="Budget" domain="[('analytic_account_id','=',analytic_account_id)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="budget_inherit_id_new" model="ir.ui.view">
+        <field name="name">Inherit Budget View</field>
+        <field name="model">crossovered.budget</field>
+        <field name="inherit_id" ref="account_budget.crossovered_budget_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group//field[@name='user_id']" position="after">
+                <field name="project_id" string="Project" invisible="1" />
+                <field name="analytic_account_id" string="Analytic Account"/>
+            </xpath>
+            <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='date_from']" position="before">
+                <field name="project_id" invisible="1"/>
+            </xpath>
+
+            <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='theoritical_amount']" position="attributes">
+                <attribute name="string">Consumable till Date</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='date_from']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="required">0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='date_to']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="required">0</attribute>
+            </xpath>
+            <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='analytic_account_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="force_save">1</attribute>
+
+                </xpath>
+            <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='percentage']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='planned_amount']" position="before">
+                <field name="qty"/>
+            <field name="unit_price"/>
+            </xpath>
+           <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='planned_amount']" position="attributes">
+                <attribute name="string">Budget Amount</attribute>
+            </xpath>
+           <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='practical_amount']" position="attributes">
+                <attribute name="string">Actual Amount</attribute>
+            </xpath>
+           <xpath expr="//field[@name='crossovered_budget_line']/tree//field[@name='practical_amount']" position="after">
+            <field name="net_amount"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="project_project_view_form_new" model="ir.ui.view">
+        <field name="name">project.project.view.form</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='description_page']" position="after">
+                <page string="Overview" name="project_overview">
+                    <group string="Budget details">
+                    <field name="crossovered_budget_line" nolabel="1" readonly="1">
+                        <tree>
+                            <field name="general_budget_id"/>
+                            <field name="analytic_account_id"/>
+                            <field name="paid_date"/>
+                            <field name="practical_amount" string="Actual Amount"/>
+                            <field name="theoritical_amount"/>
+                        </tree>
+                    </field>
+                    </group>
+                <group string="Purchase Order details">
+                    <field name="purchase_line" readonly="1" nolabel="1">
+                        <tree string="Purchase Lines">
+                            <field name="product_id" />
+                            <field name="crossovered_budget_id" string="Budget"/>
+                            <field name="name" />
+                            <field name="product_qty"/>
+                        </tree>
+                    </field>
+                </group>
+                <group string="Project task details">
+                    <field name="task_ids" readonly="1" nolabel="1"/>
+                </group>
+                <group string="Project Deliverables">
+                    <field name="deliverable_ids" nolabel="1">
+                        <tree>
+                            <field name="number"/>
+                            <field name="amount"/>
+                        </tree>
+                        <form>
+                            <group>
+                            <group>
+                                <field name="amount"/>
+                            </group>
+                                <group>
+                                    <field name="number"/>
+                                </group>
+                        </group>
+
+                            <group string="Lines">
+                                <field name="line_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="task_id"/>
+                                        <field name="progress"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </form>
+                    </field>
+                </group>
+                </page>
+
+<!--                <page string="Purchase Order Lines" >-->
+<!--                </page>-->
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="invoice_form_view" model="ir.ui.view">
+        <field name="name">purchase_order_form_view</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="replace">
+                <field name="partner_id" string="Supplier"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_ref']" position="replace">
+                <field name="partner_ref" string="Quotation Reference"/>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="to_street"/>
+                <field name="ship_to"/>
+                <field name="contact_to"/>
+<!--                <field name="contact_person"/>-->
+<!--                <field name="delivery_loc"/>-->
+                <field name="payment_terms"/>
+<!--                <field name="other" string="Others"/>-->
+            </xpath>
+            <xpath expr="//field[@name='project_id']" position="after">
+<!--                <field name="street"/>-->
+<!--                <field name="from_street"/>-->
+<!--                <field name="ship_from"/>-->
+<!--                <field name="contact_from"/>-->
+<!--                <field name="other"/>-->
+            </xpath>
+
+<!--            <xpath expr="//field[@name='date_approve']" position="after">-->
+<!--                <field name="street"/>-->
+<!--                <field name="from_street"/>-->
+<!--                <field name="ship_from"/>-->
+<!--                <field name="contact_from"/>-->
+<!--                <field name="to_street"/>-->
+<!--                <field name="ship_to"/>-->
+<!--                <field name="contact_to"/>-->
+<!--            </xpath>-->
+
+
+        </field>
+    </record>
+
+
+
+
+    <record id="view_purchase_order_form_new" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit.new</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="analytic_account_id" string="Accounts"/>
+                <field name="project_id" string="Project"/>
+                <field name="crossovered_budget_id"  invisible="1"/>
+            </xpath>
+            <xpath expr="//tree/field[@name='product_id']" position="after">
+                <field name="crossovered_budget_id" string="Budget"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="revised_budget_form" model="ir.ui.view">
+        <field name="name">revised.budget.view</field>
+        <field name="model">revised.budget</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button string="Approval 1" class="oe_stat_button" type="object" name="app1" attrs="{'invisible': [('revised_state', '!=','draft')]}"/>
+                    <button string="Approval 2" class="oe_stat_button" type="object" name="app2" attrs="{'invisible': [('revised_state', '!=','app1')]}"/>
+                    <button string="Approval 3" class="oe_stat_button" type="object" name="app3" attrs="{'invisible': [('revised_state', '!=','app2')]}"/>
+                    <button string="Approved" class="oe_stat_button" type="object" name="app" attrs="{'invisible': [('revised_state', '!=','app3')]}"/>
+                    <field name="revised_state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group string="Revised Budget" attrs="{'readonly': [('revised_state', '!=', 'draft')]}">
+                        <group attrs="{'readonly': [('revised_state', '!=', 'draft')]}">
+                            <field name="budget_id" string="Budget" required="1" attrs="{'readonly': [('revised_state', '!=', 'draft')]}" />
+                            <field name="date" attrs="{'readonly': [('revised_state', '!=', 'draft')]}" string="Date" />
+                        </group>
+                    </group>
+                    <group string='Revised Budget Lines'>
+                        <field name='budget_id_lines'>
+                            <tree string="Budget Lines" editable="bottom" delete="0" decoration-success="planned_amount &gt; 0" decoration-danger="planned_amount &lt; 0">
+                                <field name="general_budget_id"/>
+                                <field name="analytic_account_id"/>
+                                <field name="date_from" required="0"/>
+                                <field name="date_to" required="0"/>
+                                <field name="planned_amount" sum="Planned Amount"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+
+    <record id="action_revised_budget_form" model="ir.actions.act_window">
+        <field name="name">Revised Budget</field>
+        <field name="res_model">revised.budget</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="revised_budget_menu" name="Revised Budget" action="action_revised_budget_form" parent="account.account_reports_management_menu"/>
+
+
+
+</odoo>

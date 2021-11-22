@@ -38,6 +38,7 @@
 				<field name="packing_status" decoration-success="packing_status == 'Done'" decoration-info="packing_status == 'In Process'" widget="badge"/>
 				<field name="delivery_status" decoration-success="delivery_status == 'Delivered'" decoration-info="delivery_status == 'Shipped' or delivery_status == 'In Process'" widget="badge"/>
 				<field name="qc_by" widget="many2many_tags"/>
+				<field name="confirmed_by" />
 			</xpath>
 		</field>
 	</record>
@@ -194,14 +195,14 @@
 					<group>
 						<field name="auto_schedule_user"/>
 					</group>
-					<group string='Stock Receiving Limits'>
+					<!--<group string='Stock Receiving Limits'>
 						<field name="stock_receive_upper_limit"/>
 						<field name="stock_receive_lower_limit"/>
 					</group>
 					<group string='Stock Dispatch Limits'>
 						<field name="stock_dispatch_upper_limit"/>
 						<field name="stock_dispatch_lower_limit"/>
-					</group>
+					</group>-->
 				</page>
 			</xpath>
 		</field>

@@ -94,7 +94,13 @@ class KsSaleOrderInherit(models.Model):
 
                 else:
                     rec.ks_sync_states = False
-
+    
+    
+#     @api.model
+#     def write(self,vals):
+#         order=super(KsSaleOrderInherit,self).write(vals)
+#         
+#         return order
     @api.model
     def create(self, vals):
         if vals.get('ks_shopify_instance') and vals.get('ks_shopify_order_id'):
@@ -207,6 +213,10 @@ class KsSaleOrderInherit(models.Model):
                 })
                 if order_json:
                     order_record = self.create(order_json)
+#                     if order_record.ks_date_created:
+#                         order_record.ks_date_created=order_record.ks_date_created - timedelta(hours=5)
+#                     if order_record.ks_date_updated:
+#                         order_record.ks_date_updated=order_record.ks_date_updated - timedelta(hours=5)
                     self.env['ks.shopify.connector.instance'].ks_shopify_update_the_response(order_data, order_record,
                                                                                              'ks_shopify_order_id')
                     self.env['ks.shopify.logger'].ks_create_odoo_log_param(ks_operation_performed="create",
@@ -258,6 +268,8 @@ class KsSaleOrderInherit(models.Model):
                             'ks_shopify_transaction_id': transaction_id
                         })
                         self.write(order_json)
+#                         self.ks_date_created=self.ks_date_created - timedelta(hours=5)
+#                         self.ks_date_updated=self.ks_date_updated - timedelta(hours=5)
                         self.env['ks.shopify.connector.instance'].ks_shopify_update_the_response(order_data, self,
                                                                                                  'ks_shopify_order_id')
                         self.env['ks.shopify.logger'].ks_create_odoo_log_param(ks_operation_performed="update",
@@ -312,10 +324,11 @@ class KsSaleOrderInherit(models.Model):
                 all_retrieved_data = self.env['ks.api.handler'].ks_get_all_data(instance, 'orders', include)
             else:
                 if not date_before:
-                    date_before=datetime.today().strftime('%Y-%m-%d')
+#                     date_before=datetime.today().strftime('%Y-%m-%d')
+                    date_before=datetime.today()
                 if not date_after:
-                    date_after=datetime.now() - timedelta(days=5)
-                    date_after=date_after.strftime('%Y-%m-%d')
+                    date_after=datetime.now() - timedelta(days=1)
+#                     date_after=date_after.strftime('%Y-%m-%d')
                 all_retrieved_data = self.env['ks.api.handler'].ks_get_all_data(instance, 'orders',ids=False, additional_id=False,date_before=date_before,date_after=date_after)
         except Exception as e:
             self.env['ks.shopify.logger'].ks_create_api_log_params(operation_performed="fetch",
@@ -1005,10 +1018,15 @@ class KsSaleOrderInherit(models.Model):
                          ('ks_shopify_order_id', '=', order_data.get("id"))])
                     if order_record_exist:
                         order_record_exist.ks_shopify_import_order_update(order_data)
+                        order_record_exist.ks_date_created=order_record_exist.ks_date_created - timedelta(hours=5)
+                        order_record_exist.ks_date_updated=order_record_exist.ks_date_updated - timedelta(hours=5)
                     else:
                         if not order_data.get('cancelled_at'):
-                            order_record_exist.ks_shopify_import_order_create(
+                            new_order=order_record_exist.ks_shopify_import_order_create(
                                 order_data, instance_id)
+                            new_order.ks_date_created=new_order.ks_date_created - timedelta(hours=5)
+                            new_order.ks_date_updated=new_order.ks_date_updated - timedelta(hours=5)
+                            print ('*********',new_order)
         except Exception as e:
             _logger.info(str(e))
 
