@@ -1,7 +1,6 @@
 # Copyright (C) Softhealer Technologies.
 
 from odoo import models, fields, api
-import http
 
 
 class ShProductTemplate(models.Model):
@@ -39,10 +38,6 @@ class ShProductTemplate(models.Model):
 class Product(models.Model):
     _inherit = 'product.product'
 
-    sh_bundle_product_ids = fields.One2many(
-        'sh.product.bundle', 'product_id', string="Bundle Line")
-
-
     def compute_bundle_price(self):
         lst_price = 0.0
         if self.sh_bundle_product_ids:
@@ -61,7 +56,6 @@ class ShBundleProduct(models.Model):
     _name = 'sh.product.bundle'
     _description = 'Bundle Products'
 
-    product_id=fields.Many2one('product.product')
     sh_bundle_id = fields.Many2one('product.template', 'Bundle ID')
     sh_product_id = fields.Many2one(
         'product.product', 'Product', required=True)
