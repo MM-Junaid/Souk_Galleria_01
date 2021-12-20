@@ -12,134 +12,151 @@ import json
 
 _logger = logging.getLogger(__name__)
 
+
 class ShopifyConnectorInstance(models.Model):
-    _inherit='ks.shopify.connector.instance'
-    get_cn_url=fields.Char('Webservice URL',default='http://new.leopardscod.com/webservice/getShipmentDetailsByOrderID/format/json/')
-    leopards_tracking_url=fields.Char('CN Tracking URL',default='https://leopards.developifyapps.com/track')
-    leopards_api_key=fields.Char('API Key',default='DC6A25D9B75AAB28495CF3675724471A')
-    leopards_api_password=fields.Char('Password',default='ZIVNI@123456')
+    _inherit = 'ks.shopify.connector.instance'
+    get_cn_url = fields.Char('Webservice URL',
+                             default='http://new.leopardscod.com/webservice/getShipmentDetailsByOrderID/format/json/')
+    leopards_tracking_url = fields.Char('CN Tracking URL', default='https://leopards.developifyapps.com/track')
+    leopards_api_key = fields.Char('API Key', default='DC6A25D9B75AAB28495CF3675724471A')
+    leopards_api_password = fields.Char('Password', default='ZIVNI@123456')
+
 
 class Account_move(models.Model):
-    _inherit='account.move'
-    leopards_tracking_url=fields.Char('Tracking URL')
-    shipment_status=fields.Char('Shipment Status')
-    city=fields.Char('City')
-    leopards_weight=fields.Float('Leopards Weight')
+    _inherit = 'account.move'
+    leopards_tracking_url = fields.Char('Tracking URL')
+    shipment_status = fields.Char('Shipment Status')
+    city = fields.Char('City')
+    leopards_weight = fields.Float('Leopards Weight')
+
 
 class SaleOrder(models.Model):
-    _inherit='sale.order'
-    leopards_tracking_url=fields.Char('Tracking URL')
-    shipment_status=fields.Char('Shipment Status')
-    city=fields.Char('City')
-    leopards_weight=fields.Float('Leopards Weight')
-    
+    _inherit = 'sale.order'
+    leopards_tracking_url = fields.Char('Tracking URL')
+    shipment_status = fields.Char('Shipment Status')
+    city = fields.Char('City')
+    leopards_weight = fields.Float('Leopards Weight')
+    cn_number = fields.Char('CN Number')
+
     def get_shimpment_details_queue(self):
-        shopify_instance=self.env['ks.shopify.connector.instance'].search([])
+        shopify_instance = self.env['ks.shopify.connector.instance'].search([])
         for instance in shopify_instance:
-            sale_orders=self.env['sale.order'].search([('ks_shopify_instance','=',instance.id)])
+            sale_orders = self.env['sale.order'].search([('ks_shopify_instance', '=', instance.id)])
             for order in sale_orders:
-                data={
-                'api_key':str(instance.leopards_api_key),
-                'api_password':str(instance.leopards_api_password),
-                'shipment_order_id':[str(order.name)]
+                data = {
+                    'api_key': str(instance.leopards_api_key),
+                    'api_password': str(instance.leopards_api_password),
+                    'shipment_order_id': [str(order.name)]
                 }
                 my_json_string = json.dumps(data)
-                abc_headers={
-               'Content-Type': 'application/json',
-               }
-                result = requests.post(str(instance.get_cn_url),headers=abc_headers,data=my_json_string)
-                error=result.json().get('error')
+                abc_headers = {
+                    'Content-Type': 'application/json',
+                }
+                result = requests.post(str(instance.get_cn_url), headers=abc_headers, data=my_json_string)
+                error = result.json().get('error')
                 if not error:
                     for each in result.json().get('data'):
-                        tracking_number=each['track_number']
-                        shipment_status=each['booked_packet_status']
-                        city=each['destination_city']
-                        leopards_weight=each['booked_packet_weight']
-                    order.write({'leopards_tracking_url':str(instance.leopards_tracking_url)+"/"+tracking_number,
-                                        'shipment_status':shipment_status,
-                                        'city':city,
-                                        'leopards_weight':leopards_weight})
-                    account_move_obj=self.env['account.move'].search([('invoice_origin','=',order.name)])
+                        tracking_number = each['track_number']
+                        shipment_status = each['booked_packet_status']
+                        city = each['destination_city']
+                        leopards_weight = each['booked_packet_weight']
+                    order.write({'leopards_tracking_url': str(instance.leopards_tracking_url) + "/" + tracking_number,
+                                 'shipment_status': shipment_status,
+                                 'city': city,
+                                 'leopards_weight': leopards_weight})
+                    account_move_obj = self.env['account.move'].search([('invoice_origin', '=', order.name)])
                     for inv in account_move_obj:
-                        inv.write({'leopards_tracking_url':str(instance.leopards_tracking_url)+"/"+tracking_number,
-                                        'shipment_status':shipment_status,
-                                        'city':city,
-                                        'leopards_weight':leopards_weight})
+                        inv.write({'leopards_tracking_url': str(instance.leopards_tracking_url) + "/" + tracking_number,
+                                   'shipment_status': shipment_status,
+                                   'city': city,
+                                   'leopards_weight': leopards_weight})
+
     def get_shipment_details(self):
-        shopify_instance=self.env['ks.shopify.connector.instance'].search([('id','=',self.ks_shopify_instance.id)])
+        shopify_instance = self.env['ks.shopify.connector.instance'].search([('id', '=', self.ks_shopify_instance.id)])
         if shopify_instance:
-            data={
-            'api_key':str(shopify_instance.leopards_api_key),
-            'api_password':str(shopify_instance.leopards_api_password),
-            'shipment_order_id':[str(self.name)]
+            data = {
+                'api_key': str(shopify_instance.leopards_api_key),
+                'api_password': str(shopify_instance.leopards_api_password),
+                'shipment_order_id': [str(self.name)]
             }
             my_json_string = json.dumps(data)
-            abc_headers={
-           'Content-Type': 'application/json',
-           }
-            result = requests.post(str(shopify_instance.get_cn_url),headers=abc_headers,data=my_json_string)
-            error=result.json().get('error')
+            abc_headers = {
+                'Content-Type': 'application/json',
+            }
+            result = requests.post(str(shopify_instance.get_cn_url), headers=abc_headers, data=my_json_string)
+            error = result.json().get('error')
             if not error:
                 for each in result.json().get('data'):
-                    tracking_number=each['track_number']
-                    shipment_status=each['booked_packet_status']
-                    city=each['destination_city']
-                    leopards_weight=each['booked_packet_weight']
-                self.write({'leopards_tracking_url':str(shopify_instance.leopards_tracking_url)+"/"+tracking_number,
-                                    'shipment_status':shipment_status,
-                                    'city':city,
-                                    'leopards_weight':leopards_weight})
-                account_move_obj=self.env['account.move'].search([('invoice_origin','=',self.name)])
+                    tracking_number = each['track_number']
+                    shipment_status = each['booked_packet_status']
+                    city = each['destination_city']
+                    leopards_weight = each['booked_packet_weight']
+                self.write(
+                    {'leopards_tracking_url': str(shopify_instance.leopards_tracking_url) + "/" + tracking_number,
+                     'shipment_status': shipment_status,
+                     'city': city,
+                     'leopards_weight': leopards_weight})
+                account_move_obj = self.env['account.move'].search([('invoice_origin', '=', self.name)])
                 for inv in account_move_obj:
-                    inv.write({'leopards_tracking_url':str(shopify_instance.leopards_tracking_url)+"/"+tracking_number,
-                                    'shipment_status':shipment_status,
-                                    'city':city,
-                                    'leopards_weight':leopards_weight})
-    
-    
+                    inv.write(
+                        {'leopards_tracking_url': str(shopify_instance.leopards_tracking_url) + "/" + tracking_number,
+                         'shipment_status': shipment_status,
+                         'city': city,
+                         'leopards_weight': leopards_weight})
+
+    def generate_load_sheet(self):
+        pass
+        # result = requests.post(str(instance.get_cn_url), headers=abc_headers, data=my_json_string)
+
+        # aa = 'http://new.leopardscod.com/webservice/generateLoadSheet/format/json/'
+
+
 class Picking(models.Model):
     _inherit = "stock.picking"
-        
+
     def set_shipped(self):
-        shopify_instance=self.env['ks.shopify.connector.instance'].search([('id','=',self.sale_id.ks_shopify_instance.id)])
+        shopify_instance = self.env['ks.shopify.connector.instance'].search(
+            [('id', '=', self.sale_id.ks_shopify_instance.id)])
         if shopify_instance:
-            data={
-            'api_key':str(shopify_instance.leopards_api_key),
-            'api_password':str(shopify_instance.leopards_api_password),
-            'shipment_order_id':[str(self.sale_id.name)]
+            data = {
+                'api_key': str(shopify_instance.leopards_api_key),
+                'api_password': str(shopify_instance.leopards_api_password),
+                'shipment_order_id': [str(self.sale_id.name)]
             }
             my_json_string = json.dumps(data)
-            abc_headers={
-           'Content-Type': 'application/json',
-           }
-            result = requests.post(str(shopify_instance.get_cn_url),headers=abc_headers,data=my_json_string)
-            error=result.json().get('error')
+            abc_headers = {
+                'Content-Type': 'application/json',
+            }
+            result = requests.post(str(shopify_instance.get_cn_url), headers=abc_headers, data=my_json_string)
+            error = result.json().get('error')
             if not error:
                 for each in result.json().get('data'):
-                    tracking_number=each['track_number']
-                    shipment_status=each['booked_packet_status']
-                    city=each['destination_city']
-                    leopards_weight=each['booked_packet_weight']
-                    
-                self.sale_id.write({'leopards_tracking_url':str(shopify_instance.leopards_tracking_url)+"/"+tracking_number,
-                                    'shipment_status':shipment_status,
-                                    'city':city,
-                                    'leopards_weight':leopards_weight})
-                account_move_obj=self.env['account.move'].search([('invoice_origin','=',self.sale_id.name)])
+                    tracking_number = each['track_number']
+                    shipment_status = each['booked_packet_status']
+                    city = each['destination_city']
+                    leopards_weight = each['booked_packet_weight']
+
+                self.sale_id.write(
+                    {'leopards_tracking_url': str(shopify_instance.leopards_tracking_url) + "/" + tracking_number,
+                     'shipment_status': shipment_status,
+                     'city': city,
+                     'leopards_weight': leopards_weight})
+                account_move_obj = self.env['account.move'].search([('invoice_origin', '=', self.sale_id.name)])
                 for inv in account_move_obj:
-                    inv.write({'leopards_tracking_url':str(shopify_instance.leopards_tracking_url)+"/"+tracking_number,
-                                        'shipment_status':shipment_status,
-                                        'city':city,
-                                        'leopards_weight':leopards_weight})
-        
-        
-        return super(Picking,self).set_shipped()
+                    inv.write(
+                        {'leopards_tracking_url': str(shopify_instance.leopards_tracking_url) + "/" + tracking_number,
+                         'shipment_status': shipment_status,
+                         'city': city,
+                         'leopards_weight': leopards_weight})
+
+        return super(Picking, self).set_shipped()
+
 
 class SaleReport(models.Model):
     _inherit = "sale.report"
-    shipment_status=fields.Char('Shipment Status')
-    city=fields.Char('City')
-    
+    shipment_status = fields.Char('Shipment Status')
+    city = fields.Char('City')
+
     def _query(self, with_clause='', fields={}, groupby='', from_clause=''):
         with_ = ("WITH %s" % with_clause) if with_clause else ""
 
@@ -229,4 +246,3 @@ class SaleReport(models.Model):
         # self._table = sale_report
         tools.drop_view_if_exists(self.env.cr, self._table)
         self.env.cr.execute("""CREATE or REPLACE VIEW %s as (%s)""" % (self._table, self._query()))
-    
