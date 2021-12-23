@@ -44,8 +44,6 @@ class SoukLoadSheet(models.Model):
         binary_format = download_load_sheet_result.content
         self.attachment = base64.b64encode(binary_format)
 
-
-
         # data = base64.b64decode(binary_format)
         # self.attachment = binary_format
         # file = open("/home/zubair/Music/abc.pdf", "rb")
@@ -128,6 +126,7 @@ class SaleOrderTwo(models.Model):
                     }
 
     def generate_cn_number(self):
+        track_list = []
         not_shopify_order = []
         shopify_order = []
         shopify_instance = self.env['ks.shopify.connector.instance'].search([])
@@ -146,18 +145,18 @@ class SaleOrderTwo(models.Model):
                                 'api_password': str(instance.leopards_api_password),
                                 'booked_packet_order_id': cn_inst.name,
                                 'booked_packet_weight': 34,
-                                'booked_packet_no_piece': 3,
-                                'booked_packet_collect_amount': 6,
+                                'booked_packet_no_piece': len(cn_inst.order_line.ids),
+                                'booked_packet_collect_amount': cn_inst.amount_total,
                                 'origin_city': '789',
                                 'destination_city': '3',
                                 'shipment_name_eng': 'self',
-                                'shipment_email': 'ayaz@alamcotton.com',
-                                'shipment_phone': '03334344567',
-                                'shipment_address': 'aaa',
-                                'consignment_name_eng': 'ggg',
-                                'consignment_phone': '03222',
-                                'consignment_address': 'aafgg',
-                                'special_instructions': 'hey this is me'
+                                'shipment_email': 'self',
+                                'shipment_phone': 'self',
+                                'shipment_address': 'self',
+                                'consignment_name_eng': cn_inst.partner_id.name,
+                                'consignment_phone': cn_inst.partner_id.phone,
+                                'consignment_address': cn_inst.partner_id.city,
+                                'special_instructions': 'How you experienced our service?'
                             }
                             my_json_string = json.dumps(data)
                             abc_headers = {
@@ -172,11 +171,22 @@ class SaleOrderTwo(models.Model):
                                     sale_rec.write({
                                         'cn_number': track_number,
                                     })
+                                    track_list.append(1)
 
                         else:
                             not_shopify_order.append(cn_inst.id)
-
-
+        # if track_list:
+        #     raise ValidationError(_("You have  generated CN for this record."))
+            # message_id = self.env['message.wizard'].create({'message': _("CN is successfully created")})
+            # return {
+            #     'name': _('Successfull'),
+            #     'type': 'ir.actions.act_window',
+            #     'view_mode': 'form',
+            #     'res_model': 'message.wizard',
+            #     # pass the id
+            #     'res_id': message_id.id,
+            #     'target': 'new'
+            # }
 
     def generat_load_sheet(self):
         print('hello world')
