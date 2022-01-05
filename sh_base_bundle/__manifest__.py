@@ -17,7 +17,7 @@ Do you want to make a combo of several products? This module is useful to make a
                     """,
     "version": "14.0.2",
     "depends": [
-        "product"
+        "product", 'sale'
     ],
     "application": True,
     "data": [
