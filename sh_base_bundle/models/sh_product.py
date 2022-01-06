@@ -4,15 +4,16 @@ from odoo import models, fields, api
 
 
 class ShProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = 'product.product'
 
     sh_bundle_product_ids = fields.One2many(
         'sh.product.bundle', 'sh_bundle_id', string="Bundle Line")
     sh_is_bundle = fields.Boolean('Is Bundled ?')
     sh_amount_total = fields.Monetary(
         string='Total', store=True, readonly=True, compute='_amount_all')
+    # sh_product_qty = fields.Float()
 
-    @api.depends('sh_bundle_product_ids.sh_price_subtotal')
+    @api.depends('sh_bundle_product_ids.sh_price_subtotal', 'sh_bundle_product_ids.sh_qty')
     def _amount_all(self):
         amount_total = 0.0
         for order in self:
@@ -58,7 +59,7 @@ class ShBundleProduct(models.Model):
     _name = 'sh.product.bundle'
     _description = 'Bundle Products'
 
-    sh_bundle_id = fields.Many2one('product.template', 'Bundle ID')
+    sh_bundle_id = fields.Many2one('product.product', 'Bundle ID')
     sh_product_id = fields.Many2one(
         'product.product', 'Product', required=True)
     sh_qty = fields.Float("Quantity")
@@ -74,6 +75,16 @@ class ShBundleProduct(models.Model):
             self.sh_qty = 1.0
             self.sh_price_unit = self.sh_product_id.list_price
 
+    # @api.onchange('sh_qty')
+    # def _onchange_sh_product_id(self):
+    #     if self.sh_product_id:
+    #         product_rec = self.env['product.product'].browse(self.sh_product_id.id)
+    #         for rec in product_rec:
+    #             rec.write({
+    #                 'sh_product_qty': self.sh_qty
+    #             })
+    #         self.sh_uom = self.sh_product_id.uom_id.id
+
     @api.onchange('sh_qty', 'sh_price_unit')
     def get_price_subtotal(self):
         for rec in self:
@@ -85,8 +96,8 @@ class ShSaleOrderInherit(models.Model):
 
     def action_confirm(self):
         res = super(ShSaleOrderInherit, self).action_confirm()
-        # context = self._context.copy()
-        # hhhh = self.with_context(context)
+        context = self._context.copy()
+        hhhh = self.with_context(context)
         product_line_list = []
         delivery_line_list = []
 
@@ -104,7 +115,7 @@ class ShSaleOrderInherit(models.Model):
                         # b_line_product = self.env['product.product'].browse(b_line.product_id.id)
                         for b_rec in single_product:
                             product_line_list.append(
-                                {'id':b_rec.id, 'name':b_rec.name}
+                                {'id': b_rec.id, 'name': b_rec.name, 'sh_qty': b_line.sh_qty}
                             )
 
         for record in delivery_id:
@@ -118,7 +129,7 @@ class ShSaleOrderInherit(models.Model):
                                 'location_dest_id': 5,
                                 'product_id': vals['id'],
                                 'product_uom': 1,
-                                'product_uom_qty': 1.0,
+                                'product_uom_qty': vals['sh_qty'],
                             }),
                         ],
                 })
