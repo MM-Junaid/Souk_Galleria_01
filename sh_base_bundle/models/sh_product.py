@@ -105,9 +105,10 @@ class ShSaleOrderInherit(models.Model):
         ggg = delivery_id.move_ids_without_package
         delivery_record = self.env['stock.picking'].browse(delivery_id.id)
 
-        order_line_product_ids = self.order_line.product_id
+        order_line_product_ids = self.order_line
         for line_ids in order_line_product_ids:
-            sale_order_line_product = self.env['product.product'].browse(line_ids.id)
+            line_quantity = line_ids.product_uom_qty
+            sale_order_line_product = self.env['product.product'].browse(line_ids.product_id.id)
             for sh_rec in sale_order_line_product:
                 if sale_order_line_product.sh_is_bundle:
                     for b_line in sh_rec.sh_bundle_product_ids:
@@ -115,7 +116,7 @@ class ShSaleOrderInherit(models.Model):
                         # b_line_product = self.env['product.product'].browse(b_line.product_id.id)
                         for b_rec in single_product:
                             product_line_list.append(
-                                {'id': b_rec.id, 'name': b_rec.name, 'sh_qty': b_line.sh_qty}
+                                {'id': b_rec.id, 'name': b_rec.name, 'sh_qty': b_line.sh_qty * line_ids.product_uom_qty}
                             )
 
         for record in delivery_id:
