@@ -1,7 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_revised_budget,revised.budget,model_revised_budget,,1,1,1,1
-access_invoice_deliverable,invoice.deliverable,model_invoice_deliverable,,1,1,1,1
-access_deliverable_line,deliverable.line,model_deliverable_line,,1,1,1,1
-access_crossovered_budget,crossovered.budget,model_crossovered_budget,,1,1,0,0
-
-
