@@ -250,12 +250,15 @@ class SaleOrderTwo(models.Model):
             if not error:
                 cities_data = result.json().get('city_list')
                 for single_city in cities_data:
-                    leopards_city_create = self.env['leopards.partners.cities'].create(
-                        {
-                            'name': single_city['name'],
-                            'city_id': single_city['id']
-                        }
-                    )
+
+                    leopards_city_create = self.env['leopards.partners.cities']
+                    if not leopards_city_create.search([]):
+                        leopards_city_create.create(
+                            {
+                                'name': single_city['name'],
+                                'city_id': single_city['id']
+                            }
+                        )
 
 
 class LeopardsCitiesNewModel(models.Model):
