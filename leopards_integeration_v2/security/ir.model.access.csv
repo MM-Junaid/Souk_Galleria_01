@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_message_wizard,message.wizard,model_message_wizard,base.group_user,1,1,1,1
+access_souk_loadsheet,souk.loadsheet,model_souk_loadsheet,base.group_user,1,1,1,1
+access_leopards_partners_cities,leopards.partners.cities,model_leopards_partners_cities,base.group_user,1,1,1,1

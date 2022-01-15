@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data> 
+<template id="purchase_order_ext">
+     <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div style="padding:20px">
+                    <div class="header">
+                        <div class="row">
+                            <div class="col-3"><img style="width:200px;height:100px;margin-top:-10px" t-att-src="image_data_uri(o.company_id.logo)"/></div>
+                            <div class="col-6"><h2 style="text-align:center;padding-top:90px">PURCHASE ORDER</h2></div>
+                            <div class="col-3" style="font-size:12px"><span>MALIR EXPRESSWAY LTD</span>
+                                        <span style="margin-top:-5px">A-22KDA Scheme No,1 Main Karsaz Road</span>
+                                        <span style="margin-top:-5px">Karachi, Pakistan</span>
+                                        <span style="margin-top:-5px">Phone:(021)34920991-92</span></div>
+                        </div>
+<!--                        <div class="row">-->
+<!--                            <table style="width:100%;margin-top:-20px">-->
+<!--                                <tr>-->
+<!--                                    <td style="width:20%"><img style="width:200px;height:100px" t-att-src="image_data_uri(o.company_id.logo)"/></td>-->
+<!--                                    <td style="width:60%;"> <h2 style="text-align:center;margin-top:90px">PURCHASE ORDER</h2></td>-->
+<!--                                    <td style="width:20%;font-size:12px;margin-top:-20px">-->
+<!--                                        <span>MALIR EXPRESSWAY LTD</span>-->
+<!--                                        <span style="margin-top:-5px">A-22KDA Scheme No,1 Main Karsaz Road</span>-->
+<!--                                        <span style="margin-top:-5px">Karachi, Pakistan</span>-->
+<!--                                        <span style="margin-top:-5px">Phone:(021)34920991-92</span>-->
+<!--                                    </td>-->
+<!--                                </tr>-->
+
+<!--                            </table>-->
+
+<!--                        </div>-->
+                    </div>
+                    <div class="row">
+                        <table style="width:99%">
+                            <tr>
+                                <td style="width:40%">
+                                    <div>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+
+                                        <table style="margin-left:-3px;width:100%;border:1px solid black;">
+                                            <tr>
+                                                <td style="background:#d3d3d3;">
+                                                    <span style="text-size:24px;padding-left:5px;padding-right:5px;padding-top:5px"><strong>SUPPLIER</strong></span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left:1px;">
+                                                    <strong><span t-field="o.partner_id.name"/></strong>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left:1px;">
+                                                    <span t-field="o.partner_id.street"/>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td style="padding-left:1px;">
+                                                    <span t-field="o.partner_id.country_id.name"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left:1px;">
+                                                    Phone :<span t-field="o.partner_id.phone"/>
+                                                </td>
+                                            </tr>
+
+                                        </table>
+<!--                                        <ol class="list-unstyled" style="list-style-type: none;">-->
+<!--                                                <li><span style="text-size:24px;background:#d3d3d3;padding-left:15px;padding-right:5px;padding-top:5px"><strong>SUPPLIER</strong></span></li>-->
+<!--                                                <li><span t-field="o.partner_id.name"/></li>-->
+<!--                                                <li t-if="o.partner_id.street"><span t-field="o.partner_id.street"/></li>-->
+<!--                                                <li t-if="o.partner_id.country_id"><span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.country_id.name"/></li>-->
+<!--                                                <li t-if="o.partner_id.phone">Tel: <span t-field="o.partner_id.phone"/></li>-->
+<!--                                        </ol>-->
+                                    </div>
+                                </td>
+                                <td style="width:13%">
+
+                                </td>
+                                <td style="width:40%;" >
+                                    <table style="width:100%;border:1px solid black;margin-right:px">
+                                        <tr>
+                                            <td>
+                                                Purchase Date : <t t-if="o.date_approve"> <span t-esc="o.date_approve.date()"/></t>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Purchase Req :<span t-field="o.sprogroup_purchase_request_id.name"/>
+                                            </td>
+                                        </tr>
+                                        <tr><td>
+                                            Purchase Order :<span t-field="o.name"/>
+                                        </td></tr>
+                                    </table>
+<!--                                    <ol class="list-unstyled" style="list-style-type: none;border:1px solid black;margin-left:20px">-->
+<!--                                        <li t-if="o.date_approve">Purchase Date.: <span t-field="o.date_approve"/></li>-->
+<!--                                        <li >Purchase Req:-->
+<!--&lt;!&ndash;&lt;!&ndash;                                    <span t-field="o.date_order" t-options='{"format": "dd.MM.yyyy"}'/>&ndash;&gt;&ndash;&gt;-->
+<!--                                        </li>-->
+<!--                                        <li t-if="o.name">Purchase Order: <span t-field="o.name"/></li>-->
+<!--                                    </ol>-->
+<!--                                    <li t-if="o.date_approve">Purchase Date.: <span t-field="o.date_approve"/></li>-->
+<!--                                    <li >Purchase Req:-->
+<!--&lt;!&ndash;&lt;!&ndash;                                    <span t-field="o.date_order" t-options='{"format": "dd.MM.yyyy"}'/>&ndash;&gt;&ndash;&gt;-->
+<!--                                    </li>-->
+<!--                                <li t-if="o.name">Purchase Order: <span t-field="o.name"/></li>-->
+                                    <table style="width:100%;border:1px solid black;margin-top:10px;margin-bottom:10px">
+                                            <tr>
+                                                <td style="background:#d3d3d3;">
+                                                    <span style="text-size:24px;padding-left:5px;padding-right:5px;padding-top:5px"><strong>Ship To</strong></span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left:1px;">
+                                                    <strong><span t-field="o.ship_to"/></strong>
+                                                </td>
+                                            </tr>
+<!--                                            <tr>-->
+<!--                                                <td style="padding-left:1px;">-->
+<!--                                                    <span t-field="o.to_street"/>-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+
+                                            <tr>
+                                                <td style="padding-left:1px;">
+                                                    Phone :<span t-field="o.contact_to"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding-left:1px;">
+                                                    Delivery Location : <span t-field="o.delivery_loc"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+<!--                                    <ol class="list-unstyled" style="list-style-type: none;margin-left:10px">-->
+
+<!--                            <br />-->
+<!--                                <li t-if="o.date_approve">Purchase Date.: <span t-field="o.date_approve"/></li>-->
+<!--                                <li >Purchase Req:-->
+<!--&lt;!&ndash;&lt;!&ndash;                                    <span t-field="o.date_order" t-options='{"format": "dd.MM.yyyy"}'/>&ndash;&gt;&ndash;&gt;-->
+<!--                                </li>-->
+<!--                                <li t-if="o.name">Purchase Order: <span t-field="o.name"/></li>-->
+<!--                                <br />-->
+<!--                                <li></li>-->
+<!--                                        <li><span style="text-size:24px;background:#d3d3d3;padding-left:5px;padding-right:5px;padding-top:5px"><strong>Ship To</strong></span></li>-->
+<!--                                        <li >Address: <span t-field="o.to_street"/></li>-->
+<!--                                        <li >Contact Person: <span t-field="o.contact_person"/></li>-->
+<!--                                        <li >Contact No: <span t-field="o.contact_to"/></li>-->
+<!--                                        <li>Delivery Loc: <span t-field="o.delivery_loc"/></li>-->
+<!--                            </ol>-->
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="col-4"></div>
+                        <div class="col-4" style="font-size:14px;">
+
+
+                        </div>
+                    </div>
+
+                    <div>
+                        <table class="table table-sm o_main_table" style="font-size: 14px;border-collapse: collapse;width:99%">
+                            <thead>
+                                <tr>
+                                    <th name="th_description" style="background:#d3d3d3;border:1px solid black;padding:5px"><strong>Nr.</strong></th>
+                                    <th name="th_description" class="text-right" style="background:#d3d3d3;border:1px solid black;padding:5px"><strong>Description</strong></th>
+                                    <th name="th_description" class="text-right" style="background:#d3d3d3;border:1px solid black;padding:5px"><strong>Delivery Date</strong></th>
+                                    <th name="th_quantity" class="text-right" style="background:#d3d3d3;border:1px solid black;padding:5px"><strong>Quantity</strong></th>
+                                    <th name="th_quantity" class="text-right" style="background:#d3d3d3;border:1px solid black;padding:5px"><strong>Unit Price</strong></th>
+                                    <th name="th_quantity" class="text-right" style="background:#d3d3d3;border:1px solid black;padding:5px"><strong>Tax</strong></th>
+                                    <th name="th_quantity" class="text-right" style="background:#d3d3d3;border:1px solid black;padding:5px"><strong>Amount</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    <t t-set="i" t-value="1"></t>
+                    <t t-set="total_unit" t-value="0"></t>
+                    <t t-set="total_qty" t-value="0"></t>
+                    <t t-foreach="o.order_line" t-as="order_line">
+                        <tr t-att-class="'bg-200 font-weight-bold o_line_section' if order_line.display_type == 'line_section' else 'font-italic o_line_note' if order_line.display_type == 'line_note' else ''">
+                            <t t-if="not order_line.display_type">
+                                <td style="border:1px solid black;">
+                                    <t t-esc="i"></t>
+                                </td>
+                                <td id="product" style="border:1px solid black">
+                                    <span t-field="order_line.name"/>
+                                </td>
+                                <td id="product" style="border:1px solid black">
+                                    <t t-if="order_line.date_planned"><span t-esc="order_line.date_planned.date()"/></t>
+                                </td>
+                                <td id="product" style="text-align:right;border:1px solid black">
+                                    <span t-field="order_line.product_qty"/>
+                                </td>
+                                <td id="product" style="text-align:right;border:1px solid black">
+                                    <span t-field="order_line.price_unit"/>
+                                </td>
+                                <td id="product" style="text-align:right;border:1px solid black">
+                                    <span t-field="order_line.taxes_id"/>
+                                </td>
+                                <td id="product" style="text-align:right;border:1px solid black">
+                                    <span t-field="order_line.price_subtotal"/>
+                                </td>
+
+                            </t>
+                            <t t-else="">
+                                <td colspan="99" id="section" style="border: hidden;">
+                                    <span t-field="order_line.name"/>
+                                </td>
+                            </t>
+                        </tr>
+                        <t t-set="total_qty" t-value="total_qty+order_line.product_qty"></t>
+                        <t t-set="total_unit" t-value="total_unit+order_line.price_unit"></t>
+                        <t t-set="i" t-value="i+1"></t>
+                    </t>
+<!--                    <tr>-->
+<!--                        <td colspan="6"><hr style="background:black;width:100%"></hr></td>-->
+<!--                    </tr>-->
+                </tbody>
+                        </table>
+                        <table style="width:100%;margin-left:-5px;margin-top:0px">
+                            <tr>
+                                <td style="width:40%">
+                                     <span><strong> Payment Terms </strong><br/><span t-field="o.payment_terms"/></span>
+                                </td>
+                                <td style="width:60%;">
+
+                                    <table class="table table-condensed" style="width:100%;margin-left:00px;font-size: 14px;border-collapse: collapse;">
+                        <tr class="">
+                            <td style="width:25%; border-top: hidden;background:#d3d3d3;padding:5px;border-bottom:1px solid black;padding-left:70px"><strong>Quantity<span style="margin-left:10px"><t t-esc="total_qty"></t></span></strong></td>
+                            <td style="width:20%;border-top: hidden;background:#d3d3d3;padding:5px;border-bottom:1px solid black"><strong></strong></td>
+                            <td style="width:55%;border-top: hidden;background:#d3d3d3;padding:5px;border-bottom:1px solid black"><strong><span style="width:100%">Untaxed Amount:</span><span style="margin-left:10px"><t t-esc="o.amount_untaxed"></t></span></strong></td>
+<!--                            <td class="width:25%;text-right" style="border-top: hidden;background:#d3d3d3;padding:5px;border-bottom:1px solid black">-->
+<!--&lt;!&ndash;                                <span t-field="o.amount_untaxed"&ndash;&gt;-->
+<!--&lt;!&ndash;                                    t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>&ndash;&gt;-->
+<!--                            </td>-->
+                        </tr>
+                        <tr>
+                            <td style="width:25%"></td>
+                            <td style="width:30%"></td>
+                            <td style="width:45%;background:#d3d3d3;padding:5px;border-bottom:1px solid black"><strong style="">Taxes:<span style="margin-left:10px"><t t-esc="o.amount_tax"></t></span></strong></td>
+
+                        </tr>
+                        <tr  class="border-black">
+                            <td style="width:25%;"></td>
+                            <td style="width:30%"></td>
+                            <td style="width:45%;background:#d3d3d3;padding:5px;border-bottom:1px solid black"><strong style="">Total<span style="margin-left:10px"><t t-esc="o.amount_total"></t></span></strong></td>
+<!--                            <td class="text-right" style="background:#d3d3d3;padding:5px;border-bottom:1px solid black">-->
+<!--                                <span t-field="o.amount_total"-->
+<!--                                    t-field-options='{"widget": "monetary", "display_currency": "o.currency_id"}'/>-->
+<!--                            </td>-->
+                        </tr>
+                    </table>
+                                </td>
+                                <tr>
+                                    <td style="width:40%">
+                                     <span><strong> Others </strong><br/><span t-field="o.notes"/></span>
+                                    </td>
+                                    <td style="width:50%"></td>
+                                    <td style="width:25%"></td>
+                                </tr>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="footer">
+                        <div>
+                        <table style="width:99%;margin-top:100px">
+                            <tr>
+                                <td style="width:70%"></td>
+                                <td style="width:30%">
+                                    <hr style="background:black;width:100%"></hr>
+                                    <center>
+                                        Authorized By <br/>
+                                        Manager Finance and Account
+                                    </center>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+            </t>
+     </t>
+</template>
+</data>
+</odoo>
+    
