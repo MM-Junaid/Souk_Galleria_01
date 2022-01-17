@@ -82,6 +82,7 @@ class SaleOrderTwo(models.Model):
         shopify_instance = self.env['ks.shopify.connector.instance'].search([])
         for instance in shopify_instance:
             if self.ks_shopify_instance.id == instance.id:
+
                 data = {
                     'api_key': str(instance.leopards_api_key),
                     'api_password': str(instance.leopards_api_password),
@@ -140,22 +141,30 @@ class SaleOrderTwo(models.Model):
                     shopify_order.append(sale_orders.id)
                     for cn_inst in sale_orders:
                         if not cn_inst.cn_number:
+                            invoice_address = cn_inst.partner_invoice_id.city
+                            delivery_address = cn_inst.partner_shipping_id.city
+                            leopard_invoice_address = self.env['leopards.partners.cities'].search([('name','=',invoice_address.capitalize())])
+                            leopard_delivery_address = self.env['leopards.partners.cities'].search([('name','=',delivery_address.capitalize())])
+                            leopard_invoice_city = leopard_invoice_address.city_id
+                            leopard_delivery_city = leopard_delivery_address.city_id
+
+
                             data = {
                                 'api_key': str(instance.leopards_api_key),
                                 'api_password': str(instance.leopards_api_password),
                                 'booked_packet_order_id': cn_inst.name,
-                                'booked_packet_weight': 34,
-                                'booked_packet_no_piece': len(cn_inst.order_line.ids),
+                                'booked_packet_weight': cn_inst.total_weight*1000,
+                                'booked_packet_no_piece': 3,
                                 'booked_packet_collect_amount': cn_inst.amount_total,
                                 'origin_city': '789',
-                                'destination_city': '3',
+                                'destination_city': leopard_delivery_city,
                                 'shipment_name_eng': 'self',
                                 'shipment_email': 'self',
                                 'shipment_phone': 'self',
                                 'shipment_address': 'self',
                                 'consignment_name_eng': cn_inst.partner_id.name,
-                                'consignment_phone': cn_inst.partner_id.phone,
-                                'consignment_address': cn_inst.partner_id.city,
+                                'consignment_phone': cn_inst.partner_shipping_id.phone,
+                                'consignment_address': cn_inst.partner_shipping_id.city,
                                 'special_instructions': 'How you experienced our service?'
                             }
                             my_json_string = json.dumps(data)
@@ -177,18 +186,18 @@ class SaleOrderTwo(models.Model):
                             not_shopify_order.append(cn_inst.id)
         # if track_list:
         #     raise ValidationError(_("You have  generated CN for this record."))
-            # message_id = self.env['message.wizard'].create({'message': _("CN is successfully created")})
-            # return {
-            #     'name': _('Successfull'),
-            #     'type': 'ir.actions.act_window',
-            #     'view_mode': 'form',
-            #     'res_model': 'message.wizard',
-            #     # pass the id
-            #     'res_id': message_id.id,
-            #     'target': 'new'
-            # }
+        # message_id = self.env['message.wizard'].create({'message': _("CN is successfully created")})
+        # return {
+        #     'name': _('Successfull'),
+        #     'type': 'ir.actions.act_window',
+        #     'view_mode': 'form',
+        #     'res_model': 'message.wizard',
+        #     # pass the id
+        #     'res_id': message_id.id,
+        #     'target': 'new'
+        # }
 
-    def generat_load_sheet(self):
+    def generate_load_sheet(self):
         print('hello world')
         cn_numbers_list = []
         shopify_instance = self.env['ks.shopify.connector.instance'].search([])
@@ -224,3 +233,42 @@ class SaleOrderTwo(models.Model):
                         'loadsheet_api_password': str(instance.leopards_api_password),
                         'loadsheet_id': track_number,
                     })
+
+    def leopards_get_all_cities(self):
+        shopify_instance = self.env['ks.shopify.connector.instance'].search([])
+        if shopify_instance:
+            data = {
+                'api_key': str(shopify_instance.leopards_api_key),
+                'api_password': str(shopify_instance.leopards_api_password),
+            }
+            my_json_string = json.dumps(data)
+            abc_headers = {
+                'Content-Type': 'application/json',
+            }
+            result = requests.post('http://new.leopardscod.com/webservice/getAllCitiesTest/format/json/',
+                                   headers=abc_headers, data=my_json_string)
+            error = result.json().get('error')
+            if not error:
+                cities_data = result.json().get('city_list')
+                leopards_city_create = self.env['leopards.partners.cities']
+                if not leopards_city_create.search([]):
+                    for single_city in cities_data:
+                        leopards_city_create.create(
+                            {
+                                'name': single_city['name'],
+                                'city_id': single_city['id']
+                            }
+                        )
+
+
+class LeopardsCitiesNewModel(models.Model):
+    _name = 'leopards.partners.cities'
+
+    name = fields.Char('Cities')
+    city_id = fields.Char('City ID')
+
+
+class LeopardsNewCitiesAdded(models.Model):
+    _inherit = 'res.partner'
+
+    leopards_cities = fields.Many2one('leopards.partners.cities', string='Leopards City', )
