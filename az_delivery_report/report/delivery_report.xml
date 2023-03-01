@@ -6,40 +6,40 @@
                 <t t-foreach="docs" t-as="o">
                     <t t-call="web.external_layout">
                         <div class="page">
-                            <table class="table table-borderless">
+                           <table class="table table-borderless">
                                 <tr>
                                     <td style="width:33%"/>
-                                    <td class="text-center text-light bg-dark" style="width:33%">
-                                        <h2>DELIVERY ORDER</h2>
+                                    <td class="text-center bg-dark text-light" style="width:33%">
+                                        <h3 style="color:white;">DELIVERY ORDER</h3>
                                     </td>
                                     <td style="width:33%"/>
                                 </tr>
                             </table>
                             <table class="table table-borderless">
                                 <tr>
-                                    <td style="width:20%">DELIVERY ORDER NO</td>
-                                    <td style="width:20%;border-bottom:1px sold black;">
+                                    <td style="width:25%">DELIVERY ORDER NO</td>
+                                    <td style="width:25%;border-bottom:1px solid black;">
                                         <!--                                        <span t-field="o.location_id"/>-->
                                         <span t-field="o.display_name"/>
                                     </td>
-                                    <td style="width:20%;"/>
-                                    <td style="width:20%;">DATE</td>
-                                    <td style="width:20%;border-bottom:1px sold;">
+                                    <td style="width:10%;"/>
+                                    <td style="width:15%;">DATE</td>
+                                    <td style="width:25%;border-bottom:1px solid;">
                                         <span t-field="o.scheduled_date"/>
                                     </td>
                                 </tr>
                                 <tr>
 
                                     <td colspan="3" style="width:60%;border:0"/>
-                                    <td style="width:20%;">VALID DATE</td>
-                                    <td style="width:20%;border-bottom:1px sold;">
+                                    <td >VALID DATE</td>
+                                    <td style="border-bottom:1px solid;">
                                         <span t-field="o.date_deadline"/>
                                     </td>
                                 </tr>
                                 <tr>
 
                                     <td>WARE HOUSE NAME</td>
-                                    <td colspan="4">
+                                    <td  style="border-bottom:1px solid;" colspan="4">
                                         <span t-field="o.location_id.comment"/>
                                     </td>
                                 </tr>
@@ -47,7 +47,7 @@
                             <table class="table table-bordered">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <td>ITEM CODE</td>
+                                        <th>ITEM CODE</th>
                                         <th>PARTICULAR/PRODUCT NAME</th>
                                         <th>QUANTITY</th>
                                     </tr>
@@ -115,7 +115,6 @@
                                     </td>
                                 </tr>
                             </table>
-
                         </div>
                     </t>
                 </t>
