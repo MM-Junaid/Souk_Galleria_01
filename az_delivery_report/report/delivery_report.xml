@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="az_delivery_order_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td style="width:33%"/>
+                                    <td class="text-center text-light bg-dark" style="width:33%">
+                                        <h2>DELIVERY ORDER</h2>
+                                    </td>
+                                    <td style="width:33%"/>
+                                </tr>
+                            </table>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td style="width:20%">DELIVERY ORDER NO</td>
+                                    <td style="width:20%;border-bottom:1px sold black;">
+                                        <!--                                        <span t-field="o.location_id"/>-->
+                                        <span t-field="o.display_name"/>
+                                    </td>
+                                    <td style="width:20%;"/>
+                                    <td style="width:20%;">DATE</td>
+                                    <td style="width:20%;border-bottom:1px sold;">
+                                        <span t-field="o.scheduled_date"/>
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td colspan="3" style="width:60%;border:0"/>
+                                    <td style="width:20%;">VALID DATE</td>
+                                    <td style="width:20%;border-bottom:1px sold;">
+                                        <span t-field="o.date_deadline"/>
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td>WARE HOUSE NAME</td>
+                                    <td colspan="4">
+                                        <span t-field="o.location_id.comment"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <td>ITEM CODE</td>
+                                        <th>PARTICULAR/PRODUCT NAME</th>
+                                        <th>QUANTITY</th>
+                                    </tr>
+
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="o.move_line_ids_without_package" t-as="id">
+                                        <td>
+                                            <span t-field="id.product_id.default_code"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="id.product_id"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="id.qty_done"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>QTY In Words</td>
+                                        <td colspan="4">
+                                            <span t-field="o.int_to_word"/>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td style="width:10%;">
+                                        RE Valid:
+                                    </td>
+                                    <td style="width:5%"/>
+                                    <td style="border-bottom:1px solid; width:20%;"/>
+                                    <td style="width:5%"/>
+
+                                    <td style="border:1px solid; width:40%">
+                                        LC NO
+                                        <span t-field="o.lc_no"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        Note:
+                                        <br/>
+                                        <span t-field="o.note"/>
+                                    </td>
+                                    <td colspan="2"/>
+
+                                </tr>
+                            </table>
+                            <div style="padding-top:200px"/>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td style="border-top:1px solid; width:30%;">
+                                        AUTHORIZED SIGNATURE
+                                    </td>
+                                    <td style="width:5%"/>
+                                    <td style="border-top:1px solid; width:30%;">
+                                        AUTHORIZED SIGNATURE
+                                    </td>
+                                    <td style="width:5%"/>
+
+                                    <td style="border-top:1px solid; width:30%;">
+                                        AUTHORIZED SIGNATURE
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>
