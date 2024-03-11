@@ -2,25 +2,18 @@
 # Part of Softhealer Technologies
 
 {
-    "name": "All In One Backdate - Advance | Sale Backdate | Purchase Backdate | Accounting Backdate | Invoice Backdate | Inventory Backdate | MRP Backdate | Manufacturing Backdate",
+    "name": "All In One Backdate - Advance | Sale Backdate | Purchase Backdate | Accounting Backdate | Invoice Backdate | Inventory Backdate",
     "author" : "Softhealer Technologies",
     "website": "https://www.softhealer.com",
     "support": "support@softhealer.com",
     "category": "Extra Tools",
-    "summary": "Backdate Remarks Confirmation Backdate Mass Backdate Sale order backdate Purchase order backdate custom backdate MRP order backdate Bill backdate Credit Note backdate Debit note backdate Payment backdate Picking order backdate Scrap backdate Odoo",
-    "description": """Our module is useful for confirm sales, purchase, accounting, MRP & inventory orders with selected confirmation backdate. You can put a custom backdate and remarks. You can mass assign backdate in one click. This selected date and remarks are also reflects in the stock moves, product moves & journal entries.""",
+    "summary": "Backdate Remarks Confirmation Backdate Mass Backdate Sale order backdate Purchase order backdate custom backdate Credit Note backdate Debit note backdate Payment backdate Picking order backdate Scrap backdate Odoo",
+    "description": """Our module is useful for confirm sales, purchase, accounting, inventory orders with selected confirmation backdate. You can put a custom backdate and remarks. You can mass assign backdate in one click. This selected date and remarks are also reflects in the stock moves, product moves & journal entries.""",
     "version": "14.0.1",
-    "depends": ["stock_account", "mrp", "purchase","sale_management", ],
+    "depends": ["stock_account", "purchase","sale_management", ],
     "data": [
 
-        'sh_mrp_backdate/security/ir.model.access.csv',
-        'sh_mrp_backdate/security/backdate_security.xml',
-        'sh_mrp_backdate/wizard/mrp_backdate_wizard.xml',
-        'sh_mrp_backdate/views/mrp_config_settings.xml',
-        'sh_mrp_backdate/views/mrp_production.xml',
-        'sh_mrp_backdate/views/stock_move.xml',
-        'sh_mrp_backdate/views/stock_move_line.xml',
-        'sh_mrp_backdate/views/mrp_backdate_multi_action.xml',
+
 
 
         'sh_purchase_backdate/security/ir.model.access.csv',
